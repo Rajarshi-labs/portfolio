@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>About — Rajarshi Deka</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+<style>
+:root{--white:#fafaf8;--off:#f2f0ec;--ink:#0a0a0a;--ink2:#1a1a1a;--mist:#e8e5df;--gold:#c8a84b;--gold2:#e8c87a;--rust:#c84b2f;--dim:#6b6860;--glass:rgba(250,250,248,.85);}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--white);color:var(--ink);font-family:'Syne',sans-serif;overflow-x:hidden;cursor:none;}
+#cur{position:fixed;width:8px;height:8px;background:var(--gold);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);mix-blend-mode:multiply;}
+#cur-ring{position:fixed;width:44px;height:44px;border:1.5px solid rgba(200,168,75,.4);border-radius:50%;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);}
+#particle-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;}
+/* PAGE LOADER */
+#page-loader{position:fixed;inset:0;background:var(--ink);z-index:9000;display:flex;align-items:center;justify-content:center;transform-origin:top;}
+#loader-canvas{position:absolute;inset:0;}
+.pl-text{font-family:'Cormorant Garamond',serif;font-size:clamp(3rem,10vw,7rem);font-weight:300;letter-spacing:.4em;color:var(--white);opacity:0;font-style:italic;position:relative;z-index:2;}
+#curtain{position:fixed;inset:0;background:var(--ink);z-index:9500;transform:scaleY(0);transform-origin:bottom;}
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;padding:24px 6%;display:flex;justify-content:space-between;align-items:center;z-index:500;}
+.nav-bg{position:absolute;inset:0;background:var(--glass);backdrop-filter:blur(20px);border-bottom:1px solid rgba(200,168,75,.12);}
+.nav-logo{font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-style:italic;font-weight:600;color:var(--gold);text-decoration:none;position:relative;z-index:1;}
+.nav-links{display:flex;gap:44px;list-style:none;position:relative;z-index:1;}
+.nav-links a{font-family:'JetBrains Mono',monospace;font-size:.65rem;letter-spacing:.18em;text-transform:uppercase;color:var(--dim);text-decoration:none;transition:.3s;position:relative;}
+.nav-links a::before{content:'';position:absolute;bottom:-3px;left:0;width:0;height:1px;background:var(--gold);transition:width .4s cubic-bezier(.77,0,.18,1);}
+.nav-links a:hover{color:var(--ink);}
+.nav-links a:hover::before{width:100%;}
+/* HEADER */
+.page-header{padding:140px 6% 70px;border-bottom:1px solid var(--mist);position:relative;z-index:1;}
+.page-tag{font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.3em;color:var(--gold);text-transform:uppercase;margin-bottom:20px;opacity:.7;}
+.page-title{font-family:'Cormorant Garamond',serif;font-size:clamp(4rem,12vw,10rem);line-height:.85;font-weight:300;letter-spacing:.02em;overflow:hidden;}
+.page-title span{display:block;transform:translateY(110%);}
+.page-title em{font-style:italic;color:var(--gold);}
+/* INTRO */
+.intro-wrap{display:grid;grid-template-columns:1.1fr .9fr;gap:80px;padding:80px 6%;position:relative;z-index:1;}
+.intro-body{font-family:'Cormorant Garamond',serif;font-size:1.35rem;line-height:1.9;font-weight:300;color:var(--ink2);}
+.intro-body em{font-style:italic;color:var(--gold);}
+.stats-panel{}
+.stat-row{display:grid;grid-template-columns:1fr 1fr;gap:0;border-bottom:1px solid var(--mist);}
+.stat-cell{padding:18px 0;padding-right:16px;}
+.stat-label{font-family:'JetBrains Mono',monospace;font-size:.55rem;letter-spacing:.2em;text-transform:uppercase;color:var(--dim);margin-bottom:5px;}
+.stat-value{font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:400;line-height:1.3;}
+.stat-value.gold{color:var(--gold);}
+/* LOVES */
+.section{padding:80px 6%;border-top:1px solid var(--mist);position:relative;z-index:1;}
+.sec-eyebrow{display:flex;align-items:center;gap:16px;margin-bottom:50px;}
+.sec-line{width:36px;height:1px;background:var(--gold);}
+.sec-label{font-family:'JetBrains Mono',monospace;font-size:.62rem;letter-spacing:.25em;text-transform:uppercase;color:var(--gold);}
+.sec-title{font-family:'Cormorant Garamond',serif;font-size:2.8rem;font-weight:300;font-style:italic;}
+.loves-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;margin-top:40px;}
+.love-card{background:var(--off);padding:32px 28px;cursor:default;transition:.4s;position:relative;overflow:hidden;}
+.love-card:hover{background:var(--ink);}
+.love-card:hover .lc-cat,.love-card:hover .lc-title,.love-card:hover .lc-desc{color:var(--white);}
+.love-card:hover .lc-cat{color:var(--gold);}
+.love-card::after{content:'';position:absolute;bottom:0;left:0;width:0;height:2px;background:var(--gold);transition:width .5s cubic-bezier(.77,0,.18,1);}
+.love-card:hover::after{width:100%;}
+.lc-icon{font-size:1.5rem;margin-bottom:18px;}
+.lc-cat{font-family:'JetBrains Mono',monospace;font-size:.55rem;letter-spacing:.2em;text-transform:uppercase;color:var(--dim);margin-bottom:8px;transition:.3s;}
+.lc-title{font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:400;margin-bottom:6px;transition:.3s;}
+.lc-desc{font-size:.8rem;color:var(--dim);line-height:1.65;transition:.3s;}
+/* TRAITS */
+.traits-wrap{display:flex;flex-wrap:wrap;gap:3px;margin-top:32px;}
+.trait{font-family:'JetBrains Mono',monospace;font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;padding:12px 20px;background:var(--off);color:var(--dim);cursor:default;transition:.35s;}
+.trait:hover{background:var(--gold);color:var(--ink);transform:translateY(-4px);}
+/* PALETTE */
+.palette-strip{display:flex;height:90px;margin-top:24px;gap:2px;}
+.swatch{flex:1;position:relative;overflow:hidden;transition:flex .5s cubic-bezier(.77,0,.18,1);cursor:default;}
+.swatch:hover{flex:5;}
+.sw-label{position:absolute;bottom:12px;left:14px;font-family:'JetBrains Mono',monospace;font-size:.52rem;letter-spacing:.12em;text-transform:uppercase;opacity:0;transition:opacity .35s;font-weight:500;}
+.swatch:hover .sw-label{opacity:1;}
+/* TIMELINE */
+.timeline{position:relative;margin-top:36px;padding-left:28px;}
+.timeline::before{content:'';position:absolute;left:0;top:0;bottom:0;width:1px;background:linear-gradient(to bottom,var(--gold) 0%,transparent 100%);}
+.t-item{margin-bottom:44px;position:relative;}
+.t-item::before{content:'';position:absolute;left:-32px;top:7px;width:8px;height:8px;border-radius:50%;background:var(--gold);border:2px solid var(--white);}
+.t-year{font-family:'JetBrains Mono',monospace;font-size:.58rem;color:var(--gold);letter-spacing:.15em;margin-bottom:6px;}
+.t-title{font-family:'Cormorant Garamond',serif;font-size:1.6rem;font-weight:400;margin-bottom:6px;}
+.t-desc{font-size:.82rem;color:var(--dim);line-height:1.7;}
+footer{padding:48px 6%;border-top:1px solid var(--mist);display:flex;justify-content:space-between;align-items:center;position:relative;z-index:1;}
+.footer-logo{font-family:'Cormorant Garamond',serif;font-size:1.2rem;font-style:italic;color:var(--gold);}
+.footer-text{font-family:'JetBrains Mono',monospace;font-size:.58rem;color:var(--dim);letter-spacing:.1em;}
+@media(max-width:768px){.intro-wrap{grid-template-columns:1fr;gap:40px;}.loves-grid{grid-template-columns:1fr 1fr;}}
+</style>
+</head>
+<body>
+<div id="cur"></div>
+<div id="cur-ring"></div>
+<canvas id="particle-canvas"></canvas>
+<div id="page-loader"><canvas id="loader-canvas"></canvas><div class="pl-text" id="plText">About</div></div>
+<div id="curtain"></div>
+
+<nav>
+  <div class="nav-bg"></div>
+  <a class="nav-logo" href="index.html">RD</a>
+  <ul class="nav-links">
+    <li><a href="about.html">About</a></li>
+    <li><a href="projects.html">Projects</a></li>
+    <li><a href="skills.html">Skills</a></li>
+    <li><a href="contact.html">Contact</a></li>
+  </ul>
+</nav>
+
+<div class="page-header">
+  <div class="page-tag">01 — About Me</div>
+  <h1 class="page-title"><span id="ptSpan">RAJARSHI <em>DEKA</em></span></h1>
+</div>
+
+<div class="intro-wrap">
+  <p class="intro-body" id="introBody">
+    I'm <em>Rajarshi Deka</em> — an aspiring engineer from <em>India</em> with a deep love for building things that feel both technically sharp and genuinely beautiful. I'm drawn to the intersection of <em>AI, web development,</em> and clean systems thinking.<br><br>
+    I believe great software isn't just functional — it's something you <em>feel.</em> Every interaction, every line of logic should be intentional. That's the standard I hold myself to.
+  </p>
+  <div class="stats-panel" id="statsPanel">
+    <div class="stat-row">
+      <div class="stat-cell"><div class="stat-label">Location</div><div class="stat-value">India 🇮🇳</div></div>
+      <div class="stat-cell"><div class="stat-label">Role</div><div class="stat-value">Aspiring Engineer</div></div>
+    </div>
+    <div class="stat-row">
+      <div class="stat-cell"><div class="stat-label">Focus</div><div class="stat-value">Web Dev + AI</div></div>
+      <div class="stat-cell"><div class="stat-label">GitHub</div><div class="stat-value">Rajarshi-labs</div></div>
+    </div>
+    <div class="stat-row">
+      <div class="stat-cell" style="grid-column:1/-1"><div class="stat-label">Status</div><div class="stat-value gold">Open to Opportunities ✦</div></div>
+    </div>
+    <div class="stat-row">
+      <div class="stat-cell" style="grid-column:1/-1"><div class="stat-label">Email</div><div class="stat-value" style="font-family:'JetBrains Mono',monospace;font-size:.82rem;">dekarajarshi7@gmail.com</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="sec-eyebrow"><div class="sec-line"></div><span class="sec-label">Things I Love</span></div>
+  <div class="sec-title">Things that fuel me ♥</div>
+  <div class="loves-grid">
+    <div class="love-card"><div class="lc-icon">🍛</div><div class="lc-cat">Favourite Food</div><div class="lc-title">Biryani & Momos</div><div class="lc-desc">Nothing beats biryani on a rainy day. Momos with spicy chutney are a close second.</div></div>
+    <div class="love-card"><div class="lc-icon">🎨</div><div class="lc-cat">Favourite Colour</div><div class="lc-title">Deep Black + Gold</div><div class="lc-desc">Power, elegance, and precision. Not a coincidence this portfolio uses it.</div></div>
+    <div class="love-card"><div class="lc-icon">🎵</div><div class="lc-cat">Favourite Music</div><div class="lc-title">Lo-fi & Synthwave</div><div class="lc-desc">Lo-fi for coding focus, synthwave when I need energy. Dark electronic is my default.</div></div>
+    <div class="love-card"><div class="lc-icon">📚</div><div class="lc-cat">Favourite Book</div><div class="lc-title">Atomic Habits</div><div class="lc-desc">James Clear's system changed how I approach learning. Small steps compound into extraordinary results.</div></div>
+    <div class="love-card"><div class="lc-icon">🎮</div><div class="lc-cat">Favourite Games</div><div class="lc-title">Strategy & Puzzles</div><div class="lc-desc">Chess, logic puzzles, city builders — games that train the same muscle as good engineering.</div></div>
+    <div class="love-card"><div class="lc-icon">🌙</div><div class="lc-cat">Work Style</div><div class="lc-title">Night Owl Builder</div><div class="lc-desc">My best code is written between 10pm–2am. Late night quiet unlocks a different mode of creativity.</div></div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="sec-eyebrow"><div class="sec-line"></div><span class="sec-label">Personality</span></div>
+  <div class="sec-title">My traits</div>
+  <div class="traits-wrap">
+    <span class="trait">Curious</span><span class="trait">Detail-Obsessed</span><span class="trait">Systems Thinker</span><span class="trait">Fast Learner</span><span class="trait">Introvert</span><span class="trait">Night Owl</span><span class="trait">Self-Taught</span><span class="trait">Ambitious</span><span class="trait">Builder</span><span class="trait">Minimalist</span>
+  </div>
+</div>
+
+<div class="section">
+  <div class="sec-eyebrow"><div class="sec-line"></div><span class="sec-label">Colour Palette</span></div>
+  <div class="sec-title">My colour world</div>
+  <p style="font-family:'JetBrains Mono',monospace;font-size:.58rem;color:var(--dim);letter-spacing:.18em;text-transform:uppercase;margin:8px 0 0">Hover to explore</p>
+  <div class="palette-strip" style="margin-top:20px;">
+    <div class="swatch" style="background:#c8a84b"><span class="sw-label" style="color:#000">Gold</span></div>
+    <div class="swatch" style="background:#0a0a0a"><span class="sw-label" style="color:#444">Void</span></div>
+    <div class="swatch" style="background:#c84b2f"><span class="sw-label" style="color:#fff">Fire</span></div>
+    <div class="swatch" style="background:#1a3a5c"><span class="sw-label" style="color:#aaa">Ocean</span></div>
+    <div class="swatch" style="background:#2d5a27"><span class="sw-label" style="color:#aaa">Forest</span></div>
+    <div class="swatch" style="background:#f0ede6"><span class="sw-label" style="color:#000">Light</span></div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="sec-eyebrow"><div class="sec-line"></div><span class="sec-label">Timeline</span></div>
+  <div class="sec-title">My journey</div>
+  <div class="timeline">
+    <div class="t-item"><div class="t-year">2022</div><div class="t-title">First Line of Code</div><div class="t-desc">Wrote my first HTML page. The moment it rendered in a browser — I was hooked.</div></div>
+    <div class="t-item"><div class="t-year">2023</div><div class="t-title">Discovered JS & Animations</div><div class="t-desc">Fell in love with GSAP. Realized UI can feel alive. Started obsessing over motion design.</div></div>
+    <div class="t-item"><div class="t-year">2024</div><div class="t-title">Explored AI & ML</div><div class="t-desc">Started learning Python seriously. Built my first AI project — a study planner using machine learning.</div></div>
+    <div class="t-item"><div class="t-year">2025</div><div class="t-title">Building in Public</div><div class="t-desc">Launched this portfolio. Seeking opportunities, collaborations, and projects that push my limits.</div></div>
+  </div>
+</div>
+
+<footer>
+  <span class="footer-logo">Rajarshi Deka</span>
+  <span class="footer-text">dekarajarshi7@gmail.com</span>
+  <span class="footer-text">About — 01</span>
+</footer>
+
+<script>
+gsap.registerPlugin(ScrollTrigger);
+const cur=document.getElementById('cur'),ring=document.getElementById('cur-ring');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cur.style.left=mx+'px';cur.style.top=my+'px';});
+(function tick(){rx+=(mx-rx)*.1;ry+=(my-ry)*.1;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(tick);})();
+
+/* PARTICLES */
+(function initP(cid,col){
+  const canvas=document.getElementById(cid),ctx=canvas.getContext('2d');
+  let W,H;function r(){W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight;}r();window.addEventListener('resize',r);
+  const pts=Array.from({length:100},()=>({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.3,vy:(Math.random()-.5)*.3,r:Math.random()*1.5+.4,phase:Math.random()*Math.PI*2}));
+  let t=0;
+  (function draw(){ctx.clearRect(0,0,W,H);t+=.005;
+    for(let w=0;w<9;w++){ctx.beginPath();const yb=(w+1)*(H/10);for(let x=0;x<=W;x+=4){const y=yb+Math.sin(x*.003+t+w*.7)*38;x===0?ctx.moveTo(x,y):ctx.lineTo(x,y);}ctx.strokeStyle=`rgba(${col},.03)`;ctx.lineWidth=1;ctx.stroke();}
+    pts.forEach(p=>{p.x+=p.vx;p.y+=p.vy+Math.sin(t+p.phase)*.18;if(p.x<0)p.x=W;if(p.x>W)p.x=0;if(p.y<0)p.y=H;if(p.y>H)p.y=0;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle=`rgba(${col},.3)`;ctx.fill();});
+    for(let i=0;i<pts.length;i++)for(let j=i+1;j<pts.length;j++){const dx=pts[i].x-pts[j].x,dy=pts[i].y-pts[j].y,d=Math.sqrt(dx*dx+dy*dy);if(d<110){ctx.beginPath();ctx.moveTo(pts[i].x,pts[i].y);ctx.lineTo(pts[j].x,pts[j].y);ctx.strokeStyle=`rgba(${col},${.1*(1-d/110)})`;ctx.lineWidth=.5;ctx.stroke();}}
+    requestAnimationFrame(draw);
+  })();
+})('particle-canvas','180,150,90');
+
+/* LOADER CANVAS */
+(function(){const c=document.getElementById('loader-canvas'),ctx=c.getContext('2d');let W,H;function r(){W=c.width=window.innerWidth;H=c.height=window.innerHeight;}r();
+  const pts=Array.from({length:60},()=>({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.5,vy:(Math.random()-.5)*.5,r:Math.random()*1.2+.3}));
+  let running=true,t=0;
+  (function draw(){if(!running)return;ctx.clearRect(0,0,W,H);t+=.004;
+    for(let w=0;w<6;w++){ctx.beginPath();const yb=(w+1)*(H/7);for(let x=0;x<=W;x+=5){const y=yb+Math.sin(x*.004+t+w)*45;x===0?ctx.moveTo(x,y):ctx.lineTo(x,y);}ctx.strokeStyle=`rgba(200,168,75,${.05+w*.01})`;ctx.lineWidth=1;ctx.stroke();}
+    pts.forEach(p=>{p.x+=p.vx;p.y+=p.vy;if(p.x<0)p.x=W;if(p.x>W)p.x=0;if(p.y<0)p.y=H;if(p.y>H)p.y=0;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle='rgba(200,168,75,.35)';ctx.fill();});
+    requestAnimationFrame(draw);})();
+  window.stopLoader=()=>{running=false;};
+})();
+
+/* ENTRY ANIMATION */
+gsap.timeline()
+  .to('#plText',{opacity:1,y:0,duration:.5,ease:'power3.out'})
+  .to('#plText',{opacity:0,delay:.7,duration:.4})
+  .to('#page-loader',{scaleY:0,duration:.8,ease:'power3.inOut',onComplete:()=>{document.getElementById('page-loader').style.display='none';window.stopLoader&&window.stopLoader();}})
+  .to('#ptSpan',{y:'0%',duration:1.1,ease:'power4.out'},'-=.2')
+  .from('#introBody',{y:30,opacity:0,duration:.9},'-=.5')
+  .from('#statsPanel',{y:20,opacity:0,duration:.8},'-=.6')
+  .from('nav',{y:-20,opacity:0,duration:.6},'-=.8');
+
+/* SCROLL ANIMS */
+gsap.utils.toArray('.love-card,.trait,.t-item').forEach((el,i)=>gsap.from(el,{scrollTrigger:{trigger:el,start:'top 92%'},y:30,opacity:0,duration:.65,delay:(i%4)*.07,ease:'power3.out'}));
+
+/* PAGE TRANSITIONS */
+function navigateTo(href){gsap.to('#curtain',{scaleY:1,transformOrigin:'bottom',duration:.55,ease:'power3.in',onComplete:()=>{window.location.href=href;}});}
+document.querySelectorAll('a[href]').forEach(a=>{const h=a.getAttribute('href');if(h&&!h.startsWith('#')&&!h.startsWith('mailto')&&!h.startsWith('http')){a.addEventListener('click',e=>{e.preventDefault();navigateTo(h);});}});
+</script>
+</body>
+</html>

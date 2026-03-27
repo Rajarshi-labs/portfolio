@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Projects — Rajarshi Deka</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+<style>
+:root{--white:#fafaf8;--off:#f2f0ec;--ink:#0a0a0a;--mist:#e8e5df;--gold:#c8a84b;--gold2:#e8c87a;--rust:#c84b2f;--dim:#6b6860;--glass:rgba(250,250,248,.85);}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--white);color:var(--ink);font-family:'Syne',sans-serif;overflow-x:hidden;cursor:none;}
+#cur{position:fixed;width:8px;height:8px;background:var(--gold);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);mix-blend-mode:multiply;}
+#cur-ring{position:fixed;width:44px;height:44px;border:1.5px solid rgba(200,168,75,.4);border-radius:50%;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);}
+#particle-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;}
+#page-loader{position:fixed;inset:0;background:var(--ink);z-index:9000;display:flex;align-items:center;justify-content:center;transform-origin:top;}
+#loader-canvas{position:absolute;inset:0;}
+.pl-text{font-family:'Cormorant Garamond',serif;font-size:clamp(3rem,10vw,7rem);font-weight:300;letter-spacing:.4em;color:var(--white);opacity:0;font-style:italic;position:relative;z-index:2;}
+#curtain{position:fixed;inset:0;background:var(--ink);z-index:9500;transform:scaleY(0);transform-origin:bottom;}
+nav{position:fixed;top:0;left:0;right:0;padding:24px 6%;display:flex;justify-content:space-between;align-items:center;z-index:500;}
+.nav-bg{position:absolute;inset:0;background:var(--glass);backdrop-filter:blur(20px);border-bottom:1px solid rgba(200,168,75,.12);}
+.nav-logo{font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-style:italic;font-weight:600;color:var(--gold);text-decoration:none;position:relative;z-index:1;}
+.nav-links{display:flex;gap:44px;list-style:none;position:relative;z-index:1;}
+.nav-links a{font-family:'JetBrains Mono',monospace;font-size:.65rem;letter-spacing:.18em;text-transform:uppercase;color:var(--dim);text-decoration:none;transition:.3s;position:relative;}
+.nav-links a::before{content:'';position:absolute;bottom:-3px;left:0;width:0;height:1px;background:var(--gold);transition:width .4s;}
+.nav-links a:hover{color:var(--ink);}
+.nav-links a:hover::before{width:100%;}
+.page-header{padding:140px 6% 70px;border-bottom:1px solid var(--mist);position:relative;z-index:1;}
+.page-tag{font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.3em;color:var(--gold);text-transform:uppercase;margin-bottom:20px;opacity:.7;}
+.page-title{font-family:'Cormorant Garamond',serif;font-size:clamp(4rem,12vw,10rem);line-height:.85;font-weight:300;overflow:hidden;}
+.page-title span{display:block;transform:translateY(110%);}
+.page-title em{font-style:italic;color:var(--gold);}
+/* PROJECT LIST */
+.proj-list{padding:0 6%;position:relative;z-index:1;}
+.proj-item{border-bottom:1px solid var(--mist);padding:56px 0;display:grid;grid-template-columns:70px 1fr 1.1fr 50px;gap:40px;align-items:center;cursor:none;position:relative;overflow:hidden;}
+.proj-item::before{content:'';position:absolute;inset:0;background:var(--off);transform:scaleX(0);transform-origin:left;transition:transform .5s cubic-bezier(.77,0,.18,1);z-index:-1;}
+.proj-item:hover::before{transform:scaleX(1);}
+.proj-num{font-family:'JetBrains Mono',monospace;font-size:.6rem;color:var(--dim);letter-spacing:.15em;}
+.proj-name-col{}
+.proj-title{font-family:'Cormorant Garamond',serif;font-size:clamp(1.8rem,4vw,3rem);font-weight:300;line-height:1;transition:color .3s;}
+.proj-item:hover .proj-title{color:var(--gold);}
+.proj-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px;}
+.proj-tag{font-family:'JetBrains Mono',monospace;font-size:.52rem;letter-spacing:.1em;text-transform:uppercase;border:1px solid var(--mist);padding:4px 10px;color:var(--dim);transition:.3s;}
+.proj-item:hover .proj-tag{border-color:rgba(200,168,75,.4);color:var(--gold);}
+.proj-desc{font-size:.88rem;color:var(--dim);line-height:1.75;}
+.proj-arrow{font-size:1.4rem;color:var(--mist);transition:.4s;justify-self:end;}
+.proj-item:hover .proj-arrow{color:var(--gold);transform:translate(4px,-4px);}
+/* FEATURED */
+.section{padding:80px 6%;border-top:1px solid var(--mist);position:relative;z-index:1;}
+.sec-eyebrow{display:flex;align-items:center;gap:16px;margin-bottom:50px;}
+.sec-line{width:36px;height:1px;background:var(--gold);}
+.sec-label{font-family:'JetBrains Mono',monospace;font-size:.62rem;letter-spacing:.25em;text-transform:uppercase;color:var(--gold);}
+.feat-grid{display:grid;grid-template-columns:1.5fr 1fr;gap:3px;height:480px;}
+.feat-main{background:var(--off);position:relative;overflow:hidden;display:flex;align-items:flex-end;padding:40px;}
+.feat-main-canvas{position:absolute;inset:0;}
+.feat-main-content{position:relative;z-index:1;}
+.feat-label{font-family:'JetBrains Mono',monospace;font-size:.58rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;}
+.feat-title{font-family:'Cormorant Garamond',serif;font-size:2.8rem;font-weight:300;line-height:1;}
+.feat-desc{font-size:.85rem;color:var(--dim);line-height:1.65;margin-top:8px;}
+.feat-side{display:grid;gap:3px;}
+.feat-card{background:var(--off);padding:30px;cursor:none;position:relative;overflow:hidden;transition:.4s;}
+.feat-card:hover{background:var(--ink);}
+.feat-card:hover .fc-label,.feat-card:hover .fc-title,.feat-card:hover .fc-desc{color:var(--white);}
+.feat-card:hover .fc-label{color:var(--gold);}
+.feat-card::after{content:'VIEW PROJECT';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:'JetBrains Mono',monospace;font-size:.65rem;letter-spacing:.25em;color:var(--gold);opacity:0;transition:.3s;}
+.feat-card:hover::after{opacity:1;}
+.fc-label{font-family:'JetBrains Mono',monospace;font-size:.55rem;letter-spacing:.18em;text-transform:uppercase;color:var(--dim);transition:.3s;}
+.fc-title{font-family:'Cormorant Garamond',serif;font-size:1.6rem;font-weight:400;margin-top:8px;transition:.3s;}
+.fc-desc{font-size:.78rem;color:var(--dim);margin-top:6px;line-height:1.6;transition:.3s;}
+footer{padding:48px 6%;border-top:1px solid var(--mist);display:flex;justify-content:space-between;align-items:center;position:relative;z-index:1;}
+.footer-logo{font-family:'Cormorant Garamond',serif;font-size:1.2rem;font-style:italic;color:var(--gold);}
+.footer-text{font-family:'JetBrains Mono',monospace;font-size:.58rem;color:var(--dim);letter-spacing:.1em;}
+@media(max-width:768px){.proj-item{grid-template-columns:50px 1fr;}.proj-desc,.proj-arrow{display:none;}.feat-grid{grid-template-columns:1fr;height:auto;}}
+</style>
+</head>
+<body>
+<div id="cur"></div>
+<div id="cur-ring"></div>
+<canvas id="particle-canvas"></canvas>
+<div id="page-loader"><canvas id="loader-canvas"></canvas><div class="pl-text" id="plText">Projects</div></div>
+<div id="curtain"></div>
+
+<nav>
+  <div class="nav-bg"></div>
+  <a class="nav-logo" href="index.html">RD</a>
+  <ul class="nav-links">
+    <li><a href="about.html">About</a></li>
+    <li><a href="projects.html">Projects</a></li>
+    <li><a href="skills.html">Skills</a></li>
+    <li><a href="contact.html">Contact</a></li>
+  </ul>
+</nav>
+
+<div class="page-header">
+  <div class="page-tag">02 — Projects</div>
+  <h1 class="page-title"><span id="ptSpan"><em>Selected</em> Work</span></h1>
+</div>
+
+<div class="proj-list">
+  <div class="proj-item">
+    <div class="proj-num">01</div>
+    <div class="proj-name-col">
+      <div class="proj-title">AI Study Planner</div>
+      <div class="proj-tags"><span class="proj-tag">Python</span><span class="proj-tag">ML</span><span class="proj-tag">Scheduling</span></div>
+    </div>
+    <div class="proj-desc">A smart scheduling system powered by ML that adapts to your learning pace, optimizes study sessions, and tracks progress over time.</div>
+    <div class="proj-arrow">↗</div>
+  </div>
+  <div class="proj-item">
+    <div class="proj-num">02</div>
+    <div class="proj-name-col">
+      <div class="proj-title">Smart Calculator</div>
+      <div class="proj-tags"><span class="proj-tag">JavaScript</span><span class="proj-tag">CSS</span><span class="proj-tag">UI/UX</span></div>
+    </div>
+    <div class="proj-desc">Beyond arithmetic — a context-aware calculator with expression history, unit conversion, and a clean minimal interface.</div>
+    <div class="proj-arrow">↗</div>
+  </div>
+  <div class="proj-item">
+    <div class="proj-num">03</div>
+    <div class="proj-name-col">
+      <div class="proj-title">Portfolio Engine</div>
+      <div class="proj-tags"><span class="proj-tag">HTML</span><span class="proj-tag">GSAP</span><span class="proj-tag">Canvas</span></div>
+    </div>
+    <div class="proj-desc">The very site you're on — built from scratch with GSAP, particle animations, custom cursor, multi-page transitions.</div>
+    <div class="proj-arrow">↗</div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="sec-eyebrow"><div class="sec-line"></div><span class="sec-label">Featured Project</span></div>
+  <div class="feat-grid">
+    <div class="feat-main">
+      <canvas class="feat-main-canvas" id="featCanvas"></canvas>
+      <div class="feat-main-content">
+        <div class="feat-label">01 — Featured</div>
+        <div class="feat-title">AI Study Planner</div>
+        <div class="feat-desc">Adaptive learning meets machine intelligence. Tracks your habits and optimises your schedule automatically.</div>
+      </div>
+    </div>
+    <div class="feat-side">
+      <div class="feat-card">
+        <div class="fc-label">02</div>
+        <div class="fc-title">Smart Calculator</div>
+        <div class="fc-desc">Context-aware calculations with expression memory.</div>
+      </div>
+      <div class="feat-card">
+        <div class="fc-label">03</div>
+        <div class="fc-title">Portfolio Engine</div>
+        <div class="fc-desc">This portfolio — GSAP, Canvas, pure craft.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <span class="footer-logo">Rajarshi Deka</span>
+  <span class="footer-text">dekarajarshi7@gmail.com</span>
+  <span class="footer-text">Projects — 02</span>
+</footer>
+
+<script>
+gsap.registerPlugin(ScrollTrigger);
+const cur=document.getElementById('cur'),ring=document.getElementById('cur-ring');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cur.style.left=mx+'px';cur.style.top=my+'px';});
+(function tick(){rx+=(mx-rx)*.1;ry+=(my-ry)*.1;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(tick);})();
+
+function particleCanvas(cid,col,n,dark){
+  const canvas=document.getElementById(cid),ctx=canvas.getContext('2d');
+  if(!canvas)return;
+  let W,H;function r(){W=canvas.width=canvas.offsetWidth||window.innerWidth;H=canvas.height=canvas.offsetHeight||window.innerHeight;}r();window.addEventListener('resize',r);
+  const pts=Array.from({length:n||80},()=>({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.35,vy:(Math.random()-.5)*.35,r:Math.random()*1.5+.4,phase:Math.random()*Math.PI*2}));
+  let t=0;
+  (function draw(){ctx.clearRect(0,0,W,H);t+=.004;
+    const numW=8;for(let w=0;w<numW;w++){ctx.beginPath();const yb=(w+1)*(H/(numW+1));for(let x=0;x<=W;x+=4){const y=yb+Math.sin(x*.003+t+w*.7)*35;x===0?ctx.moveTo(x,y):ctx.lineTo(x,y);}ctx.strokeStyle=`rgba(${col},.04)`;ctx.lineWidth=1;ctx.stroke();}
+    pts.forEach(p=>{p.x+=p.vx;p.y+=p.vy+Math.sin(t+p.phase)*.15;if(p.x<0)p.x=W;if(p.x>W)p.x=0;if(p.y<0)p.y=H;if(p.y>H)p.y=0;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle=`rgba(${col},.3)`;ctx.fill();});
+    for(let i=0;i<pts.length;i++)for(let j=i+1;j<pts.length;j++){const dx=pts[i].x-pts[j].x,dy=pts[i].y-pts[j].y,d=Math.sqrt(dx*dx+dy*dy);if(d<100){ctx.beginPath();ctx.moveTo(pts[i].x,pts[i].y);ctx.lineTo(pts[j].x,pts[j].y);ctx.strokeStyle=`rgba(${col},${.1*(1-d/100)})`;ctx.lineWidth=.5;ctx.stroke();}}
+    requestAnimationFrame(draw);})();
+}
+particleCanvas('particle-canvas','180,150,90',100);
+particleCanvas('featCanvas','200,168,75',50);
+
+// Loader canvas
+(function(){const c=document.getElementById('loader-canvas'),ctx=c.getContext('2d');let W,H;function r(){W=c.width=window.innerWidth;H=c.height=window.innerHeight;}r();
+  const pts=Array.from({length:60},()=>({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.5,vy:(Math.random()-.5)*.5,r:Math.random()*.8+.3}));
+  let running=true,t=0;(function draw(){if(!running)return;ctx.clearRect(0,0,W,H);t+=.004;for(let w=0;w<6;w++){ctx.beginPath();const yb=(w+1)*(H/7);for(let x=0;x<=W;x+=5){const y=yb+Math.sin(x*.004+t+w)*45;x===0?ctx.moveTo(x,y):ctx.lineTo(x,y);}ctx.strokeStyle=`rgba(200,168,75,${.05+w*.01})`;ctx.lineWidth=1;ctx.stroke();}pts.forEach(p=>{p.x+=p.vx;p.y+=p.vy;if(p.x<0)p.x=W;if(p.x>W)p.x=0;if(p.y<0)p.y=H;if(p.y>H)p.y=0;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle='rgba(200,168,75,.35)';ctx.fill();});requestAnimationFrame(draw);})();
+  window.stopLoader=()=>{running=false;};
+})();
+
+gsap.timeline()
+  .to('#plText',{opacity:1,duration:.5})
+  .to('#plText',{opacity:0,delay:.7,duration:.4})
+  .to('#page-loader',{scaleY:0,duration:.8,ease:'power3.inOut',onComplete:()=>{document.getElementById('page-loader').style.display='none';window.stopLoader&&window.stopLoader();}})
+  .to('#ptSpan',{y:'0%',duration:1.1,ease:'power4.out'},'-=.2')
+  .from('nav',{y:-20,opacity:0,duration:.6},'-=.8');
+
+gsap.utils.toArray('.proj-item').forEach((el,i)=>gsap.from(el,{scrollTrigger:{trigger:el,start:'top 88%'},x:-40,opacity:0,duration:.8,delay:i*.1,ease:'power3.out'}));
+gsap.utils.toArray('.feat-card,.feat-main').forEach((el,i)=>gsap.from(el,{scrollTrigger:{trigger:el,start:'top 88%'},y:40,opacity:0,duration:.8,delay:i*.12,ease:'power3.out'}));
+
+function navigateTo(href){gsap.to('#curtain',{scaleY:1,transformOrigin:'bottom',duration:.55,ease:'power3.in',onComplete:()=>{window.location.href=href;}});}
+document.querySelectorAll('a[href]').forEach(a=>{const h=a.getAttribute('href');if(h&&!h.startsWith('#')&&!h.startsWith('mailto')&&!h.startsWith('http')){a.addEventListener('click',e=>{e.preventDefault();navigateTo(h);});}});
+</script>
+</body>
+</html>
