@@ -33,14 +33,84 @@ body:hover #cur{opacity:1;}
 #particle-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;}
 
 /* LOADER */
-#loader{position:fixed;inset:0;background:var(--ink);z-index:10000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:32px;}
-#loader-canvas{position:absolute;inset:0;}
-.loader-content{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:24px;}
-.loader-name{font-family:'Cormorant Garamond',serif;font-size:clamp(2.5rem,8vw,6rem);font-weight:300;letter-spacing:.3em;color:var(--white);overflow:hidden;display:flex;gap:.2em;}
+#loader{
+  position:fixed;inset:0;
+  background:#f0f2f5;
+  z-index:10000;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  overflow:hidden;
+}
+#loader-canvas{position:absolute;inset:0;z-index:0;}
+
+/* vignette overlay so center text reads clearly */
+#loader::after{
+  content:'';
+  position:absolute;inset:0;
+  background:radial-gradient(ellipse 60% 60% at 50% 50%,rgba(240,242,245,0) 30%,rgba(240,242,245,.55) 100%);
+  pointer-events:none;z-index:1;
+}
+
+.loader-content{
+  position:relative;z-index:3;
+  display:flex;flex-direction:column;
+  align-items:center;gap:32px;
+}
+.loader-name{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(2.8rem,9vw,7rem);
+  font-weight:300;
+  letter-spacing:.35em;
+  color:var(--ink);
+  overflow:hidden;
+  display:flex;gap:.25em;
+}
 .loader-name span{display:inline-block;transform:translateY(110%);}
-.loader-line{width:200px;height:1px;background:rgba(255,255,255,.1);position:relative;overflow:hidden;}
-.loader-line-fill{position:absolute;top:0;left:0;height:100%;width:0;background:linear-gradient(90deg,var(--gold),var(--gold2));}
-.loader-pct{font-family:'JetBrains Mono',monospace;font-size:.65rem;color:rgba(255,255,255,.3);letter-spacing:.3em;}
+
+/* stylish pill progress bar */
+.loader-bar-shell{
+  width:260px;height:2px;
+  background:rgba(10,10,10,.1);
+  border-radius:99px;
+  position:relative;overflow:hidden;
+}
+.loader-bar-fill{
+  position:absolute;top:0;left:0;
+  height:100%;width:0%;
+  background:linear-gradient(90deg,var(--ink) 0%,var(--gold) 60%,var(--gold2) 100%);
+  border-radius:99px;
+  transition:width .08s linear;
+  box-shadow:0 0 10px rgba(200,168,75,.5);
+}
+/* glint sweep */
+.loader-bar-fill::after{
+  content:'';
+  position:absolute;top:0;right:0;
+  width:40px;height:100%;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.8),transparent);
+  animation:glint 1.2s ease infinite;
+}
+@keyframes glint{0%{transform:translateX(-40px);opacity:0}40%{opacity:1}100%{transform:translateX(0);opacity:0}}
+
+.loader-meta{
+  display:flex;align-items:center;gap:24px;
+}
+.loader-pct{
+  font-family:'JetBrains Mono',monospace;
+  font-size:.72rem;
+  color:var(--ink);
+  letter-spacing:.25em;
+  opacity:.5;
+  min-width:3ch;text-align:right;
+}
+.loader-label{
+  font-family:'JetBrains Mono',monospace;
+  font-size:.6rem;
+  letter-spacing:.3em;
+  text-transform:uppercase;
+  color:var(--dim);
+  opacity:.4;
+}
 
 /* PAGE TRANSITION */
 #curtain{position:fixed;inset:0;background:var(--ink);z-index:9500;transform:scaleY(0);transform-origin:bottom;}
@@ -148,8 +218,13 @@ footer{padding:48px 6%;border-top:1px solid var(--mist);display:flex;justify-con
       <span id="ln1">RAJARSHI</span>
       <span id="ln2">DEKA</span>
     </div>
-    <div class="loader-line"><div class="loader-line-fill" id="loaderFill"></div></div>
-    <div class="loader-pct" id="loaderPct">0%</div>
+    <div class="loader-bar-shell">
+      <div class="loader-bar-fill" id="loaderFill"></div>
+    </div>
+    <div class="loader-meta">
+      <span class="loader-label">Loading</span>
+      <span class="loader-pct" id="loaderPct">0%</span>
+    </div>
   </div>
 </div>
 
@@ -271,11 +346,11 @@ footer{padding:48px 6%;border-top:1px solid var(--mist);display:flex;justify-con
 
 <footer>
   <span class="footer-logo">Rajarshi Deka</span>
-  <span class="footer-text">dekarajarshi7@gmail.com</span>
+  <span class="footer-text"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="7c1819171d0e1d161d0e0f14154b3c1b111d1510521f1311">[email&#160;protected]</a></span>
   <span class="footer-text">© 2025</span>
 </footer>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 gsap.registerPlugin(ScrollTrigger);
 
 /* ── CURSOR ── */
@@ -346,26 +421,68 @@ document.querySelectorAll('a,button').forEach(el=>{
   draw();
 })('particle-canvas',{n:100,col:'180,155,95',numWaves:10,waveAmp:35});
 
-/* ── LOADER PARTICLES ── */
-(function loaderParticles(){
-  const canvas=document.getElementById('loader-canvas');
-  const ctx=canvas.getContext('2d');
-  let W,H;
-  function r(){W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight;}r();
-  const pts=Array.from({length:80},()=>({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.5,vy:(Math.random()-.5)*.5,r:Math.random()*1.5+.3}));
-  let running=true,t=0;
-  (function draw(){
-    if(!running)return;
-    ctx.clearRect(0,0,W,H);t+=.003;
-    for(let w=0;w<6;w++){
-      ctx.beginPath();const yb=(w+1)*(H/7);
-      for(let x=0;x<=W;x+=5){const y=yb+Math.sin(x*.004+t+w)* 50;x===0?ctx.moveTo(x,y):ctx.lineTo(x,y);}
-      ctx.strokeStyle=`rgba(200,168,75,${.06+w*.01})`;ctx.lineWidth=1;ctx.stroke();
+/* ── LOADER DOT-WAVE CANVAS ── */
+(function loaderDotWave(){
+  const canvas = document.getElementById('loader-canvas');
+  const ctx = canvas.getContext('2d');
+  let W, H, running = true;
+
+  function resize(){
+    W = canvas.width = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  const COLS = 80, ROWS = 45;
+  let t = 0;
+
+  function draw(){
+    if(!running) return;
+    ctx.clearRect(0, 0, W, H);
+
+    const cellW = W / COLS;
+    const cellH = H / ROWS;
+
+    for(let row = 0; row < ROWS; row++){
+      for(let col = 0; col < COLS; col++){
+        const nx = col / COLS; // 0..1
+        const ny = row / ROWS; // 0..1
+
+        // wave displacement — multiple sine waves combined to match reference
+        const wave1 = Math.sin(nx * 8 - t * 1.2 + ny * 4) * 0.5;
+        const wave2 = Math.sin(nx * 5 + t * 0.7 - ny * 6) * 0.3;
+        const wave3 = Math.sin((nx + ny) * 6 - t * 0.9) * 0.2;
+        const combined = wave1 + wave2 + wave3; // -1 .. 1
+
+        // dot size: big where wave peaks/troughs, small in flat areas
+        const baseR = Math.min(cellW, cellH) * 0.28;
+        const r = baseR * (0.25 + 0.75 * Math.abs(combined));
+
+        // y-offset: dots physically move up/down like the 3D wave
+        const yOffset = combined * cellH * 0.9;
+
+        // darkness: closer to wave crest = darker
+        const darkness = 0.08 + 0.72 * Math.abs(combined);
+
+        // x position — subtle x-shear for 3D feel
+        const xOffset = combined * cellW * 0.3;
+
+        const x = col * cellW + cellW / 2 + xOffset;
+        const y = row * cellH + cellH / 2 + yOffset;
+
+        ctx.beginPath();
+        ctx.arc(x, y, Math.max(r, 0.5), 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(20,30,50,${darkness})`;
+        ctx.fill();
+      }
     }
-    pts.forEach(p=>{p.x+=p.vx;p.y+=p.vy;if(p.x<0)p.x=W;if(p.x>W)p.x=0;if(p.y<0)p.y=H;if(p.y>H)p.y=0;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle='rgba(200,168,75,.4)';ctx.fill();});
+
+    t += 0.022;
     requestAnimationFrame(draw);
-  })();
-  window.stopLoaderAnim=()=>{running=false;};
+  }
+  draw();
+  window.stopLoaderAnim = () => { running = false; };
 })();
 
 /* ── LOADER SEQUENCE ── */
@@ -402,11 +519,4 @@ function navigateTo(href){
   gsap.to(curtain,{scaleY:1,transformOrigin:'bottom',duration:.55,ease:'power3.in',onComplete:()=>{window.location.href=href;}});
 }
 document.querySelectorAll('a[href]').forEach(a=>{
-  const href=a.getAttribute('href');
-  if(href&&!href.startsWith('#')&&!href.startsWith('mailto')&&!href.startsWith('http')){
-    a.addEventListener('click',e=>{e.preventDefault();navigateTo(href);});
-  }
-});
-</script>
-</body>
-</html>
+ 
